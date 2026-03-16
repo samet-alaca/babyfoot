@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { TournamentsModule } from './tournaments/tournaments.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
       retryAttempts: 10,
       retryDelay: 3000
     }),
+    TournamentsModule
   ],
   controllers: [AppController],
   providers: [AppService],
