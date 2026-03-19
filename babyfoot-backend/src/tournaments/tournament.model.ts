@@ -1,4 +1,5 @@
-import { Column, Model, Table, DataType } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, HasMany } from 'sequelize-typescript';
+import { Team } from '../teams/team.model';
 
 /**
  * Représente la structure d'un tournoi en base de données.
@@ -34,4 +35,7 @@ export class Tournament extends Model {
     allowNull: true,
   })
   description: string;
+
+  @HasMany(() => Team)
+  teams: Team[];
 }

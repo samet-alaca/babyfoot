@@ -32,6 +32,7 @@ export const useTournaments = () => {
     pending,
     error,
     createTournament,
+    updateTournament,
     deleteTournament
   };
 };

@@ -12,6 +12,7 @@ describe('TournamentsService', () => {
     create: jest.fn(),
     findAll: jest.fn(),
     findByPk: jest.fn(),
+    update: jest.fn().mockRejectedValue(new Error()),
   };
 
   beforeEach(async () => {
