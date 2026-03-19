@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Tournament } from './tournament.model';
 import { CreateTournamentDto } from './dto/create-tournament.dto';
 import { UpdateTournamentDto } from './dto/update-tournament.dto';
+import { Team } from '../teams/team.model';
 
 /**
  * Service responsable de la gestion des tournois.
@@ -51,7 +52,9 @@ export class TournamentsService {
    * @throws {NotFoundException} Si aucun tournoi n'est trouvé avec cet ID.
    */
   async findOne(id: number): Promise<Tournament> {
-    const tournament = await this.tournamentModel.findByPk(id);
+    const tournament = await this.tournamentModel.findByPk(id, {
+      include: [Team],
+    });
     if (!tournament) {
       throw new NotFoundException(`Le tournoi avec l'id ${id} n'existe pas`);
     }

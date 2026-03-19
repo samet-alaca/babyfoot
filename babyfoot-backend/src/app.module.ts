@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { TournamentsModule } from './tournaments/tournaments.module';
+import { TeamsModule } from './teams/teams.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { TournamentsModule } from './tournaments/tournaments.module';
       retryAttempts: 10,
       retryDelay: 3000
     }),
-    TournamentsModule
+    TournamentsModule,
+    TeamsModule
   ],
   controllers: [AppController],
   providers: [AppService],

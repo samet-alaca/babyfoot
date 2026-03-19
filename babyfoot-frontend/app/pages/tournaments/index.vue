@@ -9,7 +9,7 @@
           <div class="space-y-5">
             <div>
               <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Nom du tournoi</label>
-              <input v-model="form.name" type="text" placeholder="Ex: Summer Cup" 
+              <input v-model="form.name" type="text" 
                 class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300" />
             </div>
 
@@ -95,6 +95,13 @@ const loading = ref(false);
 const form = ref({ name: '', date: '', description: '' });
 
 const handleCreate = () => {
+  if (!form.value.name || !form.value.date) {
+    $toast.error('Champs manquants', {
+      description: 'Veuillez remplir tous les champs requis pour créer un tournoi.'
+    });
+    return;
+  }
+
   loading.value = true;
 
   createTournament(form.value)
