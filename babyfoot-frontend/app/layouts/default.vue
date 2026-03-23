@@ -16,7 +16,6 @@
         <div class="hidden md:flex items-center gap-8 text-[13px] font-bold uppercase tracking-widest text-gray-400">
           <NuxtLink to="/tournaments" class="hover:text-black transition-colors">Tournois</NuxtLink>
           <NuxtLink to="/teams" class="hover:text-black transition-colors">Équipes</NuxtLink>
-          <NuxtLink to="/matches" class="hover:text-black transition-colors">Matchs</NuxtLink>
           <div class="h-4 w-px bg-gray-200"></div>
           <button class="bg-black text-white px-5 py-2.5 rounded-full hover:scale-105 transition-transform">Admin</button>
         </div>

@@ -2,40 +2,43 @@ services:
   babyfoot_db:
     image: mysql:8.0
     restart: always
+    env_file: .env
     environment:
-      MYSQL_DATABASE: babyfoot_db
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_PASSWORD: 'root'
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - '3306:3306'
     volumes:
       - babyfoot_database:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -proot && mysql -u root -proot -e 'USE babyfoot_db;'"]
-      interval: 3s
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
       timeout: 5s
-      retries: 10
-      start_period: 10s
+      retries: 5
 
   babyfoot_backend:
     build: ./babyfoot-backend
     ports:
-      - '4000:4000'
+      - '${PORT}:4000'
     depends_on:
       babyfoot_db:
         condition: service_healthy
+    env_file: .env
     environment:
-      DB_HOST: babyfoot_db
-      DB_PORT: 3306
-      DB_USERNAME: root
-      DB_PASSWORD: root
-      DB_NAME: babyfoot_db
-      PORT: 4000
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+      PORT: ${PORT}
+      IS_DOCKER: 'true'
 
   babyfoot_frontend:
     build: ./babyfoot-frontend
     ports:
-      - '3000:3000'
+      - '${FRONTEND_PORT}:3000'
     depends_on:
       - babyfoot_backend
 

@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Param, ParseIntPipe, HttpCode, HttpStatus, Delete, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  ParseIntPipe,
+  HttpCode,
+  HttpStatus,
+  Delete,
+  Patch,
+} from '@nestjs/common';
 import { TournamentsService } from './tournaments.service';
 import { CreateTournamentDto } from './dto/create-tournament.dto';
 import { Tournament } from './tournament.model';
@@ -6,9 +17,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UpdateTournamentDto } from './dto/update-tournament.dto';
 
 /**
- * Point d'entrée de l'API pour la gestion des tournois.
- * * Ce contrôleur expose les endpoints REST permettant de manipuler les tournois.
- * Il délègue la logique métier au service `TournamentsService`.
+ * * Contrôleur gérant le cycle de vie des tournois.
  */
 @ApiTags('tournaments')
 @Controller('tournaments')
@@ -27,9 +36,15 @@ export class TournamentsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un nouveau tournoi' })
-  @ApiResponse({ status: 201, description: 'Le tournoi a été créé avec succès.', type: Tournament })
+  @ApiResponse({
+    status: 201,
+    description: 'Le tournoi a été créé avec succès.',
+    type: Tournament,
+  })
   @ApiResponse({ status: 400, description: 'Requête invalide' })
-  async create(@Body() createTournamentDto: CreateTournamentDto): Promise<Tournament> {
+  async create(
+    @Body() createTournamentDto: CreateTournamentDto,
+  ): Promise<Tournament> {
     return this.tournamentsService.create(createTournamentDto);
   }
 
@@ -40,7 +55,11 @@ export class TournamentsController {
    */
   @Get()
   @ApiOperation({ summary: 'Récupérer la liste de tous les tournois' })
-  @ApiResponse({ status: 200, description: 'Liste des tournois récupérée avec succès.', type: [Tournament] })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des tournois récupérée avec succès.',
+    type: [Tournament],
+  })
   async findAll(): Promise<Tournament[]> {
     return this.tournamentsService.findAll();
   }
@@ -53,8 +72,12 @@ export class TournamentsController {
    * @example GET /tournaments/1
    */
   @Get(':id')
-  @ApiOperation({ summary: 'Récupérer les détails d\'un tournoi par son ID' })
-  @ApiResponse({ status: 200, description: 'Détails du tournoi récupérés avec succès.', type: Tournament })
+  @ApiOperation({ summary: "Récupérer les détails d'un tournoi par son ID" })
+  @ApiResponse({
+    status: 200,
+    description: 'Détails du tournoi récupérés avec succès.',
+    type: Tournament,
+  })
   @ApiResponse({ status: 404, description: 'Tournoi non trouvé' })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Tournament> {
     return this.tournamentsService.findOne(id);
@@ -69,7 +92,11 @@ export class TournamentsController {
    * */
   @Patch(':id')
   @ApiOperation({ summary: 'Modifier un tournoi existant' })
-  @ApiResponse({ status: 200, description: 'Tournoi mis à jour avec succès.', type: Tournament })
+  @ApiResponse({
+    status: 200,
+    description: 'Tournoi mis à jour avec succès.',
+    type: Tournament,
+  })
   @ApiResponse({ status: 404, description: 'Tournoi non trouvé' })
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -91,5 +118,25 @@ export class TournamentsController {
   @ApiResponse({ status: 404, description: 'Tournoi non trouvé' })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.tournamentsService.remove(id);
+  }
+
+  /**
+   * Clôture officiellement un tournoi, calcule le vainqueur et fige les résultats.
+   * @param id L'identifiant du tournoi à fermer.
+   */
+  @Post(':id/close')
+  @HttpCode(200)
+  @ApiOperation({
+    summary: 'Clôturer un tournoi',
+    description:
+      'Vérifie que tous les matchs sont finis, désigne le vainqueur et change le statut en FINISHED.',
+  })
+  @ApiResponse({ status: 200, description: 'Tournoi clôturé avec succès.' })
+  @ApiResponse({
+    status: 400,
+    description: 'Certains matchs ne sont pas encore terminés.',
+  })
+  async close(@Param('id', ParseIntPipe) id: number) {
+    return this.tournamentsService.closeTournament(id);
   }
 }

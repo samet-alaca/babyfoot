@@ -1,17 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TournamentsController } from './tournaments.controller';
 import { TournamentsService } from './tournaments.service';
+import { CreateTournamentDto } from './dto/create-tournament.dto';
+import { UpdateTournamentDto } from './dto/update-tournament.dto';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 
 describe('TournamentsController', () => {
   let controller: TournamentsController;
   let service: TournamentsService;
 
-  const mockTournamentsService = {
-    create: jest.fn(dto => ({ id: 1, ...dto })),
-    findAll: jest.fn(() => [{ id: 1, name: 'Tournoi Test' }]),
-    findOne: jest.fn(id => ({ id, name: 'Tournoi Test' })),
-    update: jest.fn((id, dto) => ({ id, ...dto })),
-    remove: jest.fn(() => Promise.resolve()),
+  const mockTournament = {
+    id: 1,
+    name: 'Summer Cup',
+    date: '2026-06-01',
+    status: 'PENDING',
   };
 
   beforeEach(async () => {
@@ -20,7 +22,14 @@ describe('TournamentsController', () => {
       providers: [
         {
           provide: TournamentsService,
-          useValue: mockTournamentsService,
+          useValue: {
+            create: jest.fn(),
+            findAll: jest.fn(),
+            findOne: jest.fn(),
+            update: jest.fn(),
+            remove: jest.fn(),
+            closeTournament: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -29,61 +38,85 @@ describe('TournamentsController', () => {
     service = module.get<TournamentsService>(TournamentsService);
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
-
   describe('create', () => {
-    it('should call service.create and return the new tournament', async () => {
-      const dto = { name: 'Tournoi Test', date: '2026-06-01', description: 'Test' };
-      const result = await controller.create(dto);
+    it('should call service.create and return a tournament', async () => {
+      const dto: CreateTournamentDto = {
+        name: 'Summer Cup',
+        date: '2026-06-01',
+      };
+      jest.spyOn(service, 'create').mockResolvedValue(mockTournament as any);
 
+      expect(await controller.create(dto)).toBe(mockTournament);
       expect(service.create).toHaveBeenCalledWith(dto);
-      expect(result).toEqual({ id: 1, ...dto });
     });
   });
 
   describe('findAll', () => {
-    it('should return an array of tournaments', async () => {
-      const result = await controller.findAll();
-      
+    it('should call service.findAll and return an array', async () => {
+      const result = [mockTournament];
+      jest.spyOn(service, 'findAll').mockResolvedValue(result as any);
+
+      expect(await controller.findAll()).toBe(result);
       expect(service.findAll).toHaveBeenCalled();
-      expect(result).toEqual([{ id: 1, name: 'Tournoi Test' }]);
     });
   });
 
   describe('findOne', () => {
-    it('should return a single tournament by id', async () => {
-      const id = 1;
-      const result = await controller.findOne(id);
-      
-      expect(service.findOne).toHaveBeenCalledWith(id);
-      expect(result).toEqual({ id, name: 'Tournoi Test' });
+    it('should call service.findOne and return a tournament', async () => {
+      jest.spyOn(service, 'findOne').mockResolvedValue(mockTournament as any);
+
+      expect(await controller.findOne(1)).toBe(mockTournament);
+      expect(service.findOne).toHaveBeenCalledWith(1);
+    });
+
+    it('should throw NotFoundException if tournament is not found', async () => {
+      jest.spyOn(service, 'findOne').mockRejectedValue(new NotFoundException());
+      await expect(controller.findOne(99)).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('update', () => {
-    it('should update a tournament and return the updated tournament', async () => {
-      const id = 1;
-      const dto = { name: 'Tournoi Mis à Jour' };
-      const result = await controller.update(id, dto);
+    it('should call service.update and return updated tournament', async () => {
+      const dto: UpdateTournamentDto = { name: 'Updated Name' };
+      const result = { ...mockTournament, ...dto };
+      jest.spyOn(service, 'update').mockResolvedValue(result as any);
 
-      expect(service.update).toHaveBeenCalledWith(id, dto);
-      expect(result).toEqual({ id, ...dto });
+      expect(await controller.update(1, dto)).toBe(result);
+      expect(service.update).toHaveBeenCalledWith(1, dto);
     });
   });
 
   describe('remove', () => {
-    it('should call service.remove with the correct id', async () => {
-      const id = 1;
-      const result = await controller.remove(id);
+    it('should call service.remove and return void', async () => {
+      jest.spyOn(service, 'remove').mockResolvedValue(undefined);
 
-      expect(service.remove).toHaveBeenCalledWith(id);
-      expect(result).toBeUndefined();
+      expect(await controller.remove(1)).toBeUndefined();
+      expect(service.remove).toHaveBeenCalledWith(1);
+    });
+
+    it('should throw NotFoundException if service.remove fails', async () => {
+      jest.spyOn(service, 'remove').mockRejectedValue(new NotFoundException());
+      await expect(controller.remove(99)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('close', () => {
+    it('should call service.closeTournament', async () => {
+      jest
+        .spyOn(service, 'closeTournament')
+        .mockResolvedValue({ ...mockTournament, status: 'FINISHED' } as any);
+
+      expect(await controller.close(1)).toEqual(
+        expect.objectContaining({ status: 'FINISHED' }),
+      );
+      expect(service.closeTournament).toHaveBeenCalledWith(1);
+    });
+
+    it('should throw BadRequestException if matches are not finished', async () => {
+      jest
+        .spyOn(service, 'closeTournament')
+        .mockRejectedValue(new BadRequestException());
+      await expect(controller.close(1)).rejects.toThrow(BadRequestException);
     });
   });
 });

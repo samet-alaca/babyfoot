@@ -74,8 +74,8 @@
 </template>
 
 <script setup>
-const { teams, fetchTeams, createTeam, deleteTeam, refresh } = useTeams();
-const { tournaments, fetchTournaments } = useTournaments();
+const { teams, createTeam, deleteTeam, refresh } = useTeams();
+const { tournaments } = useTournaments();
 const { $toast } = useNuxtApp();
 
 const loading = ref(false);
@@ -105,8 +105,9 @@ const handleCreate = () => {
       return refresh();
     })
     .catch(error => {
-      $toast.error('Erreur de création', {
-        description: error.data?.message[0] || 'Une erreur est survenue lors de la création de l\'équipe.'
+      const errorMessage = Array.isArray(error.data?.message) ? error.data.message.join(' ') : error.data?.message || 'Une erreur est survenue lors de la création de l\'équipe.';
+      $toast.error("Erreur lors de la création.", {
+        description: errorMessage
       });
 
       console.error(error);
@@ -129,8 +130,9 @@ const handleDelete = (id) => {
       return refresh();
     })
     .catch(error => {
-      $toast.error('Erreur de suppression', {
-        description: error.data?.message[0] || 'Une erreur est survenue lors de la suppression de l\'équipe.'
+      const errorMessage = Array.isArray(error.data?.message) ? error.data.message.join(' ') : error.data?.message || 'Une erreur est survenue lors de la suppression de l\'équipe.';
+      $toast.error("Erreur lors de la suppression.", {
+        description: errorMessage
       });
 
       console.error(error);
