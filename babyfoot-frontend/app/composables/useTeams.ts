@@ -1,8 +1,10 @@
+import type { Team } from "~/types/tournament";
+
 export const useTeams = () => {
   const config = useRuntimeConfig();
   const apiBase = config.public.apiBase;
 
-  const { data: teams, refresh, pending, error } = useFetch<any[]>(`${apiBase}/teams`, {
+  const { data: teams, refresh, pending, error } = useFetch<Team[]>(`${apiBase}/teams`, {
     key: 'teams_list',
   });
   

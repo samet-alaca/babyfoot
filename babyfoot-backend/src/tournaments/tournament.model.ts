@@ -1,9 +1,16 @@
-import { Column, Model, Table, DataType, HasMany } from 'sequelize-typescript';
+import {
+  Column,
+  Model,
+  Table,
+  DataType,
+  HasMany,
+  ForeignKey,
+} from 'sequelize-typescript';
 import { Team } from '../teams/team.model';
+import { Match } from '../matches/match.model';
 
 /**
  * Représente la structure d'un tournoi en base de données.
- * * Cette entité stocke les informations de base et sert de pivot pour les équipes et les matchs.
  */
 @Table
 export class Tournament extends Model {
@@ -16,6 +23,16 @@ export class Tournament extends Model {
     allowNull: false,
   })
   name: string;
+
+  /**
+   * Statut actuel du tournoi.
+   * Valeurs possibles : 'PENDING' (en attente), 'FINISHED' (terminé).
+   */
+  @Column({
+    type: DataType.ENUM('PENDING', 'FINISHED'),
+    defaultValue: 'PENDING',
+  })
+  status: string;
 
   /**
    * Date prévue pour l'événement.
@@ -36,6 +53,17 @@ export class Tournament extends Model {
   })
   description: string;
 
+  @ForeignKey(() => Team)
+  @Column({
+    type: DataType.INTEGER,
+    onDelete: 'SET NULL',
+    allowNull: true,
+  })
+  winnerId: number;
+
   @HasMany(() => Team)
   teams: Team[];
+
+  @HasMany(() => Match)
+  matches: Match[];
 }

@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Param, Delete, ParseIntPipe, HttpCode, HttpStatus, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  ParseIntPipe,
+  HttpCode,
+  HttpStatus,
+  Patch,
+} from '@nestjs/common';
 import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { Team } from './team.model';
@@ -23,8 +34,15 @@ export class TeamsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Inscrire une équipe à un tournoi' })
-  @ApiResponse({ status: 201, description: 'L\'équipe a été inscrite avec succès.', type: Team })
-  @ApiResponse({ status: 400, description: 'Données invalides ou tournoi inexistant.' })
+  @ApiResponse({
+    status: 201,
+    description: "L'équipe a été inscrite avec succès.",
+    type: Team,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Données invalides ou tournoi inexistant.',
+  })
   async create(@Body() createTeamDto: CreateTeamDto): Promise<Team> {
     return this.teamsService.create(createTeamDto);
   }
@@ -47,9 +65,15 @@ export class TeamsController {
    * @example GET /teams/tournament/1
    */
   @Get('tournament/:tournamentId')
-  @ApiOperation({ summary: 'Récupérer les équipes d\'un tournoi spécifique' })
-  @ApiResponse({ status: 200, description: 'Liste des équipes du tournoi.', type: [Team] })
-  async findByTournament(@Param('tournamentId', ParseIntPipe) tournamentId: number): Promise<Team[]> {
+  @ApiOperation({ summary: "Récupérer les équipes d'un tournoi spécifique" })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des équipes du tournoi.',
+    type: [Team],
+  })
+  async findByTournament(
+    @Param('tournamentId', ParseIntPipe) tournamentId: number,
+  ): Promise<Team[]> {
     return this.teamsService.findByTournament(tournamentId);
   }
 

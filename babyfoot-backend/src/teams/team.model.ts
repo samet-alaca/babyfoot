@@ -1,5 +1,14 @@
-import { Column, DataType, Model, Table, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import {
+  Column,
+  DataType,
+  Model,
+  Table,
+  ForeignKey,
+  BelongsTo,
+  HasMany,
+} from 'sequelize-typescript';
 import { Tournament } from '../tournaments/tournament.model';
+import { Match } from '../matches/match.model';
 
 @Table
 export class Team extends Model {
@@ -19,4 +28,7 @@ export class Team extends Model {
 
   @BelongsTo(() => Tournament)
   tournament: Tournament;
+
+  @HasMany(() => Match)
+  matches: Match[];
 }

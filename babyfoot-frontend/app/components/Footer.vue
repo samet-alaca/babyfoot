@@ -66,7 +66,6 @@
 const navigation = [
   { name: 'Tournois', href: '/tournaments' },
   { name: 'Équipes', href: '/teams' },
-  { name: 'Matchs', href: '/matches' },
   { name: 'Documentation API', href: 'http://localhost:4000/api' },
 ]
 </script>

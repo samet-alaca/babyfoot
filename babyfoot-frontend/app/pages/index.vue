@@ -14,9 +14,6 @@
         <NuxtLink to="/tournaments" class="px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-xl shadow-slate-200 hover:shadow-blue-500/20">
           Commencer un tournoi
         </NuxtLink>
-        <button class="px-8 py-4 bg-white text-slate-600 border border-slate-200 rounded-2xl font-bold hover:bg-slate-50 transition-all">
-          Voir les classements
-        </button>
       </div>
     </header>
 
