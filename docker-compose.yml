@@ -1,0 +1,46 @@
+services:
+  babyfoot_db:
+    image: mysql:8.0
+    restart: always
+    env_file: .env
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - '3306:3306'
+    volumes:
+      - babyfoot_database:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  babyfoot_backend:
+    build: ./babyfoot-backend
+    ports:
+      - '${PORT}:4000'
+    depends_on:
+      babyfoot_db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+      PORT: ${PORT}
+      IS_DOCKER: 'true'
+
+  babyfoot_frontend:
+    build: ./babyfoot-frontend
+    ports:
+      - '${FRONTEND_PORT}:3000'
+    depends_on:
+      - babyfoot_backend
+
+volumes:
+  babyfoot_database:
